@@ -281,18 +281,18 @@ def save_npz(x_train_path, y_train_path, x_test_path, y_test_path, save_path, sa
 
     if not k_fold:
         if img_RGB == True:
-            inputs_np = read_images_rgb(x_train_path, [512, 512, 3])[0]  # inputs_np shape: [N, 512, 512, 3]
-            val_inputs_np = read_images_rgb(x_test_path, [512, 512, 3])[0]
+            inputs_np = read_images_rgb(x_train_path[0], [512, 512, 3])[0]  # inputs_np shape: [N, 512, 512, 3]
+            val_inputs_np = read_images_rgb(x_test_path[0], [512, 512, 3])[0]
         else:
-            inputs_np = read_images_(x_train_path, [512, 512, 1])[0]  # inputs_np shape: [N, 512, 512, 1]
-            val_inputs_np = read_images_(x_test_path, [512, 512, 1])[0]
+            inputs_np = read_images_(x_train_path[0], [512, 512, 1])[0]  # inputs_np shape: [N, 512, 512, 1]
+            val_inputs_np = read_images_(x_test_path[0], [512, 512, 1])[0]
 
         if label_div_255 == True:
-            labels_np = read_images_(y_train_path, [512, 512, 1])[0] / 255.  # labels_np shape: [N, 512, 512, 1]
-            val_labels_np = read_images_(y_test_path, [512, 512, 1])[0] / 255.
+            labels_np = read_images_(y_train_path[0], [512, 512, 1])[0] / 255.  # labels_np shape: [N, 512, 512, 1]
+            val_labels_np = read_images_(y_test_path[0], [512, 512, 1])[0] / 255.
         else:
-            labels_np = read_images_(y_train_path, [512, 512, 1])[0]  # labels_np shape: [N, 512, 512, 1]
-            val_labels_np = read_images_(y_test_path, [512, 512, 1])[0]
+            labels_np = read_images_(y_train_path[0], [512, 512, 1])[0]  # labels_np shape: [N, 512, 512, 1]
+            val_labels_np = read_images_(y_test_path[0], [512, 512, 1])[0]
         np.savez(save_path + '/' + save_file_name, X_train=inputs_np, Y_train=labels_np, X_test=val_inputs_np, Y_test=val_labels_np)
     else:
         n_fold_dict = {}

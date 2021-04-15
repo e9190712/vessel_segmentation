@@ -105,13 +105,10 @@ About ```--backbone``` you can ref to (https://github.com/qubvel/segmentation_mo
 ### Training on CAG set
 ```
 # Train a new model starting from pre-trained ImageNet weights
-python main.py --mode=train --load_Imagenet True --load_npz_path dataset/set.npz --save_model Unet_senet154_(100_epoch)_F1_model
+python main.py --mode=train --load_Imagenet True --backbone vgg16 --load_npz_path dataset_500_1/set.npz --save_model Unet_vgg_model --epoch 100 --batch_size 8 --init_lr 0.0001 --optimizer Adam --loss dice_loss_beta
 ```
 ### Testing on CAG set
 ```
 # You can also run the CAG img evaluation code with:
-python main.py --mode=test_single_img --x_test_img cag_name(raw).png --y_test_img cag_name(label).png --load_model Unet_senet154_(100_epoch)_F1_model
-
-# run the CAG　npz evaluation code with:
-python main.py --mode=test_All_PR --load_npz_path dataset/set.npz --load_model Unet_senet154_(100_epoch)_F1_model
+python main.py --mode=test_single_img --load_Imagenet True --backbone vgg16 --x_test_img cag_name(raw).png --y_test_img cag_name(label).png --load_model Unet_vgg_model
 ```

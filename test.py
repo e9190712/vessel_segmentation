@@ -84,7 +84,7 @@ class Test:
                                       bins=10, range=[0, 1])
         plt.xlabel('Confidence')
         plt.ylabel('% of Samples')
-        plt.title('SENET154(F1=0.8944)')
+        plt.title(self.args.backbone)
         plt.grid(True)
         plt.show()
         true_label_acc = [len(bin_) / Bn for Bn, bin_ in zip(counts, pixel_valu)]
@@ -101,7 +101,7 @@ class Test:
         # plt.plot([0, 1], [1, 0], ls="--", c=".3")
         plt.xlabel('Confidence')
         plt.ylabel('Accuracy')
-        plt.title('SENET154(F1=0.8944)')
+        plt.title(self.args.backbone)
         plt.grid(True)
         plt.show()
     def test_multi(self):
