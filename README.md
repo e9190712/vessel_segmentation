@@ -8,6 +8,14 @@ This repo is a python code to vessel segmentation
 4. image-classifiers == 1.0.*
 5. efficientnet == 1.0.*
 
+## Notes
+The `requirements.txt` file should list all Python libraries that the program
+depends on, and they will be installed using:
+
+```
+pip install -r requirements.txt
+```
+
 ## hardware 
 GPU : Nvidia Tesla V100 or NVIDIA TITAN Xp
 
