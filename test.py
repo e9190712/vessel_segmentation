@@ -10,9 +10,9 @@ class Test:
     def __init__(self, args):
         self.args = args
         if args.k_fold:
-            self.model_file_path = args.main_save_model_name + '_model/' + 'best_score(k='+str(args.k_fold)+').hdf5'
+            self.model_file_path = args.load_model + '/' + 'best_score(k='+str(args.k_fold)+').hdf5'
         else:
-            self.model_file_path = args.main_save_model_name + '_model/' + 'best_score.hdf5'
+            self.model_file_path = args.load_model + '/' + 'best_score.hdf5'
         if args.optimizer == 'Adam':
             self.optimizer = keras.optimizers.Adam(lr=args.init_lr)
         elif args.optimizer == 'AdamW':
@@ -108,12 +108,12 @@ class Test:
         with np.load(self.args.load_npz_path, allow_pickle=True) as f:
             x_test, y_test, img_name = f['X_test_' + str(self.args.k_fold)], f['Y_test_' + str(self.args.k_fold)], f['X_test_' + str(self.args.k_fold) + '_name']
         self.model.load_weights(self.model_file_path)
-        tool.make_path(self.args.main_save_model_name + '_fold_' + str(self.args.k_fold))
+        tool.make_path(self.args.load_model + '_fold_' + str(self.args.k_fold))
         for i in tqdm(range(1, 10), desc='threshold'):
-            tool.make_path(self.args.main_save_model_name + '_fold_' + str(self.args.k_fold) + '/th_' + str(round(0.1 * i, 1)))
-            tool.make_path(self.args.main_save_model_name + '_fold_' + str(self.args.k_fold) + '/th_' + str(round(0.1 * i, 1)) + '/predict_3plot')
-            tool.make_path(self.args.main_save_model_name + '_fold_' + str(self.args.k_fold) + '/th_' + str(round(0.1 * i, 1)) + '/predicted_image')
-            with open(self.args.main_save_model_name + '_fold_' + str(self.args.k_fold) + '/th_' + str(
+            tool.make_path(self.args.load_model + '_fold_' + str(self.args.k_fold) + '/th_' + str(round(0.1 * i, 1)))
+            tool.make_path(self.args.load_model + '_fold_' + str(self.args.k_fold) + '/th_' + str(round(0.1 * i, 1)) + '/predict_3plot')
+            tool.make_path(self.args.load_model + '_fold_' + str(self.args.k_fold) + '/th_' + str(round(0.1 * i, 1)) + '/predicted_image')
+            with open(self.args.load_model + '_fold_' + str(self.args.k_fold) + '/th_' + str(
                     round(0.1 * i, 1)) + '/valid_threshold.csv', 'w') as f:
                 f.write('img_name, precision, recall, F1\n')
                 for j, data_name in enumerate(img_name):
@@ -156,9 +156,9 @@ class Test:
                     ax[2].imshow(reshaped_res, cmap="gray")
                     ax[2].set_title("Output image")
                     # plt.show()
-                    plt.savefig(self.args.main_save_model_name + '_fold_' + str(self.args.k_fold) + '/th_' + str(
+                    plt.savefig(self.args.load_model + '_fold_' + str(self.args.k_fold) + '/th_' + str(
                         round(0.1 * i, 1)) + '/predict_3plot/' + data_name)
-                    plt.imsave(self.args.main_save_model_name + '_fold_' + str(self.args.k_fold) + '/th_' + str(
+                    plt.imsave(self.args.load_model + '_fold_' + str(self.args.k_fold) + '/th_' + str(
                         round(0.1 * i, 1)) + '/predicted_image/' + data_name, reshaped_res, cmap="gray")
         
     # def test_pixel_total(self, threshold_=5):
@@ -166,7 +166,7 @@ class Test:
     #         csv_file.write('epoch_weight, 0~0.1, 0.1~0.2, 0.2~0.3, 0.3~0.4, 0.4~0.5, 0.5~0.6, 0.6~0.7, 0.7~0.8, 0.8~0.9, 0.9~1\n')
     #         epoch_ = [epoch for epoch in range(10, self.args.epoch+1, 10)]
     #         for weight_epoch in tqdm(epoch_):
-    #             model_file_path = model_path + args.main_save_model_name + '--' + str(weight_epoch) + '.hdf5'
+    #             model_file_path = model_path + args.load_model + '--' + str(weight_epoch) + '.hdf5'
     #             self.model.load_weights(self.model_file_path)
     #             self.model.compile(self.optimizer, loss=self.loss, metrics=[recall_threshold(0.1 * threshold_), precision_threshold(0.1 * threshold_), F1_threshold(0.1 * threshold_)])
     #             inputs_np = self.read_image_rgb_single(self.args.x_test_img)

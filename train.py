@@ -8,7 +8,7 @@ import tool
 
 class Train:
     def __init__(self, args):
-        self.model_path = tool.make_path(args.main_save_model_name + '_model/')
+        self.model_path = tool.make_path(args.save_model + '/')
         self.args = args
         if args.optimizer == 'Adam':
             self.optimizer = keras.optimizers.Adam(lr=args.init_lr)
