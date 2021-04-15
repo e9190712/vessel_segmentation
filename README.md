@@ -10,6 +10,11 @@ Keras : 2.2.5 <br>
 CUDA : 10.1
 
 ## Getting Started
+### Installing
+```
+git clone https://github.com/e9190712/vessel_segmentation
+cd vessel_segmentation
+```
 ### Prerequisites
 1. python 3
 2. keras >= 2.2.0 or tensorflow >= 1.13
@@ -21,6 +26,10 @@ The `requirements.txt` file should list all Python libraries that the program
 
 ```
 pip install -r requirements.txt
+```
+or use my Sharing Environments
+```
+conda env create -f tf_1_14_0_keras.yaml
 ```
 ### Usage
 ```
@@ -73,11 +82,6 @@ optional arguments:
   --rotation ROTATION   Whether to randomly rotate the image for data augmentation. Specifies the max rotation angle in degrees.
 ```
 About ```--backbone``` you can ref to (https://github.com/qubvel/segmentation_models)
-### Installing
-```
-git clone https://github.com/e9190712/vessel_segmentation
-cd vessel_segmentation
-```
 
 ### Training on CAG set
 ```
