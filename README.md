@@ -120,7 +120,7 @@ python main.py --mode=test_single_img --load_Imagenet True --backbone vgg16 --x_
 |----------------------------------|----------------------|----------------------|
 | SE-Net154|     Dice Loss          |     0.8963          |
 | SE-Net154|     BCE             |     0.8944          |
-| InceptionResNetV2|     Dice Loss          |     0.8695          |
-| InceptionResNetV2|     BCE           |     0.8671          |
 | DenseNet121|     Dice Loss          |     0.8753          |
 | DenseNet121|     BCE           |     0.8753          |
+| InceptionResNetV2|     Dice Loss          |     0.8695          |
+| InceptionResNetV2|     BCE           |     0.8671          |
