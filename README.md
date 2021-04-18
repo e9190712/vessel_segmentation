@@ -9,6 +9,8 @@ Tensorflow(GPU) : 1.14.0 <br>
 Keras : 2.2.5 <br>
 CUDA : 10.1
 
+##FlowChart
+![avatar](Unet.png)
 ## Getting Started
 ### Installing
 ```
@@ -112,3 +114,12 @@ python main.py --mode=train --load_Imagenet True --backbone vgg16 --load_npz_pat
 # You can also run the CAG img evaluation code with:
 python main.py --mode=test_single_img --load_Imagenet True --backbone vgg16 --x_test_img cag_name(raw).png --y_test_img cag_name(label).png --load_model Unet_vgg_model
 ```
+## Performance
+| BackBone                          |     Loss Function         |     F1         |
+|----------------------------------|----------------------|----------------------|
+| SE-Net154|     Dice Loss          |     0.8963          |
+| SE-Net154|     BCE             |     0.8944          |
+| InceptionResNetV2|     Dice Loss          |     0.8695          |
+| InceptionResNetV2|     BCE           |     0.8671          |
+| DenseNet121|     Dice Loss          |     0.8753          |
+| DenseNet121|     BCE           |     0.8753          |
