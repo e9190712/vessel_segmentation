@@ -33,7 +33,8 @@ class Test:
             if args.load_Imagenet:
                 self.model = segmentation_models.Unet(args.backbone)
             else:
-                self.model = segmentation_models.Unet(args.backbone, input_shape=(None, None, 1), encoder_weights=None)
+                self.model = segmentation_models.Unet(args.backbone, input_shape=(None, None, 3), encoder_weights=None)
+                # self.model = segmentation_models.Unet(args.backbone, input_shape=(None, None, 1), encoder_weights=None)
         else:
             raise ValueError('Not correct backbone name `{}`, use {}'.format(args.backbone, [name for name,_ in segmentation_models.Backbones._default_feature_layers.items()]))
 
