@@ -1,14 +1,14 @@
 #!/bin/bash
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/mike2/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+__conda_setup="$('C:/Users/Chu/Anaconda3/condabin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/home/mike2/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/mike2/anaconda3/etc/profile.d/conda.sh"
+    if [ -f "C:/Users/Chu/Anaconda3/etc/profile.d/conda.sh" ]; then
+        . "C:/Users/Chu/Anaconda3/etc/profile.d/conda.sh"
     else
-        export PATH="/home/mike2/anaconda3/bin:$PATH"
+        export PATH="C:/Users/Chu/Anaconda3/condabin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -16,12 +16,12 @@ unset __conda_setup
 
 conda activate GPU_ENV
 
-python Unet_Backbone.py --load_npz_path 'dataset_5_fold_NoAug(gray)/set.npz' --mode 'k_fold_train' --optimizer 'Adam' --backbone "senet154" --main_save_model_name "Unet_with_senet154_11Aug(100_epoch)_F1_5F" --k_fold "2"
-python Unet_Backbone.py --load_npz_path 'dataset_5_fold_NoAug(gray)/set.npz' --mode 'k_fold_train' --optimizer 'Adam' --backbone "senet154" --main_save_model_name "Unet_with_senet154_11Aug(100_epoch)_F1_5F" --k_fold "3"
-python Unet_Backbone.py --load_npz_path 'dataset_5_fold_NoAug(gray)/set.npz' --mode 'k_fold_train' --optimizer 'Adam' --backbone "senet154" --main_save_model_name "Unet_with_senet154_11Aug(100_epoch)_F1_5F" --k_fold "4"
-python Unet_Backbone.py --load_npz_path 'dataset_5_fold_NoAug(gray)/set.npz' --mode 'k_fold_train' --optimizer 'Adam' --backbone "senet154" --main_save_model_name "Unet_with_senet154_11Aug(100_epoch)_F1_5F" --k_fold "5"
-# python Unet_Backbone.py --load_npz_path 'dataset_5_fold_NoAug(gray)/set.npz' --mode 'k_fold_train' --epoch 100 --optimizer 'Adam' --backbone "senet154" --main_save_model_name "Unet_with_senet154_11Aug(100_epoch)_F1_5F" --k_fold 2
-# python Unet_Backbone.py --load_npz_path 'dataset_5_fold_NoAug(gray)/set.npz' --mode 'k_fold_train' --epoch 100 --optimizer 'Adam' --backbone "senet154" --main_save_model_name "Unet_with_senet154_11Aug(100_epoch)_F1_5F" --k_fold 3
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 1
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 2
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 3
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 4
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 5
+
 #for i in $(seq 0 20)
 #do
 #   python main.py --test_thresholds_Unet $i

@@ -104,6 +104,7 @@ optional arguments:
                         degrees.
 ```
 About ```--backbone``` you can ref to (https://github.com/qubvel/segmentation_models)
+About ```--backbone --> original```  you can ref to (https://github.com/zhixuhao/unet)
 
 ### Training on CAG set
 ```

@@ -3,6 +3,7 @@ from tqdm import tqdm
 import keras
 from keras.callbacks import ModelCheckpoint
 import segmentation_models
+from Original_Unet import unet
 import numpy as np
 import tool
 
@@ -23,6 +24,8 @@ class Train:
             else:
                 self.model = segmentation_models.Unet(args.backbone, input_shape=(None, None, 3), encoder_weights=None)
                 # self.model = segmentation_models.Unet(args.backbone, input_shape=(None, None, 1), encoder_weights=None)
+        elif args.backbone=='original':
+            self.model = unet(input_size=(None, None, 3))
         else:
             raise ValueError('Not correct backbone name `{}`, use {}'.format(args.backbone, [name for name,_ in segmentation_models.Backbones._default_feature_layers.items()]))
 
