@@ -103,7 +103,7 @@ optional arguments:
                         augmentation. Specifies the max rotation angle in
                         degrees.
 ```
-About ```--backbone``` you can ref to (https://github.com/qubvel/segmentation_models)
+About ```--backbone``` you can ref to (https://github.com/qubvel/segmentation_models) <br>
 About ```--backbone --> original```  you can ref to (https://github.com/zhixuhao/unet)
 
 ### Training on CAG set
