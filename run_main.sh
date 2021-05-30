@@ -16,11 +16,11 @@ unset __conda_setup
 
 conda activate GPU_ENV
 
-python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 1
-python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 2
-python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 3
-python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 4
-python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(100_epoch)_5F" --k_fold 5
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(200_epoch_3e-5_lr)_newlabel_addBN_5F" --k_fold 1
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(200_epoch_3e-5_lr)_newlabel_addBN_5F" --k_fold 2
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(200_epoch_3e-5_lr)_newlabel_addBN_5F" --k_fold 3
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(200_epoch_3e-5_lr)_newlabel_addBN_5F" --k_fold 4
+python main.py --save_model "C:\Users\Chu\Desktop\work_fold\save_unet_model/Unet_model(200_epoch_3e-5_lr)_newlabel_addBN_5F" --k_fold 5
 
 #for i in $(seq 0 20)
 #do
