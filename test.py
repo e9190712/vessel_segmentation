@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 class Test:
     def __init__(self, args):
         self.args = args
-        if args.k_fold:
-            self.model_file_path = args.load_model + '/' + 'best_score(k='+str(args.k_fold)+').hdf5'
-        else:
-            self.model_file_path = args.load_model + '/' + 'best_score.hdf5'
+        # if args.k_fold:
+        #     self.model_file_path = args.load_model + '/' + 'best_score(k='+str(args.k_fold)+').hdf5'
+        # else:
+        #     self.model_file_path = args.load_model + '/' + 'best_score.hdf5'
         if args.optimizer == 'Adam':
             self.optimizer = keras.optimizers.Adam(lr=args.init_lr)
         elif args.optimizer == 'AdamW':
@@ -29,7 +29,7 @@ class Test:
         elif self.args.loss == "generalized_dice_loss":
             self.loss = generalized_dice_loss()
 
-        if args.backbone in [name for name,_ in segmentation_models.Backbones._default_feature_layers.items()] and [name for name,_ in segmentation_models.Backbones._models_update.items()]:
+        if args.backbone in [name for name, _ in segmentation_models.Backbones._default_feature_layers.items()] and [name for name,_ in segmentation_models.Backbones._models_update.items()]:
             print('Segmentation Backbone: using {}'.format(args.backbone))
             if args.load_Imagenet:
                 self.model = segmentation_models.Unet(args.backbone)
@@ -62,6 +62,7 @@ class Test:
         return images_label_np[1:]
 
     def test_single(self, threshold_=5):
+        self.model_file_path = self.args.load_model + '/' + 'best_score.hdf5'
         self.model.load_weights(self.model_file_path)
         self.model.compile(self.optimizer, loss=self.loss, metrics=[recall_threshold(0.1 * threshold_), precision_threshold(0.1 * threshold_), F1_threshold(0.1 * threshold_)])
         inputs_np = self.read_image_rgb_single(self.args.x_test_img)
@@ -108,9 +109,57 @@ class Test:
         plt.title(self.args.backbone)
         plt.grid(True)
         plt.show()
+    def test(self):
+        with np.load(self.args.load_npz_path, allow_pickle=True) as f:
+            x_test, y_test = f['X_test'], f['Y_test']
+        self.model.compile(self.optimizer, loss=self.loss, metrics=[recall_threshold(0.5), precision_threshold(0.5), F1_threshold(0.5)])
+        self.model_file_path = self.args.load_model + '/' + 'best_score.hdf5'
+        self.model.load_weights(self.model_file_path)
+        tool.make_path(self.args.load_model + '_val_img')
+        recall_list = []
+        precision_list = []
+        F1_list = []
+        for inputs_np, labels_np in zip(x_test, y_test):
+            # raw_img = inputs_np
+            inputs_np = inputs_np.reshape([1] + [inputs_np.shape[0], inputs_np.shape[1], inputs_np.shape[2]])
+            labels_np = labels_np.reshape([1] + [labels_np.shape[0], labels_np.shape[1], labels_np.shape[2]])
+            # if self.args.label_div_255 == True:
+            #     labels_np = labels_np / 255.
+            # elif self.args.label_div_255 == False:
+            labels_np = labels_np
+            eval = self.model.evaluate(inputs_np, labels_np)
+            res = self.model.predict(inputs_np)
+            reshaped_res = np.reshape(res, inputs_np.shape[1:-1])
+            reshaped_res[reshaped_res >= 0.5] = 1
+            reshaped_res[reshaped_res < 0.5] = 0
+            # reshaped_label = np.reshape(labels_np, labels_np.shape[1:-1])
+            recall_list.append(round(eval[1], 3))
+            precision_list.append(round(eval[2], 3))
+            F1_list.append(round(eval[3], 3))
+            print('Sen:{:.4f}  Pre:{:.4f}  F1:{:.4f}'.format(round(eval[1], 3), round(eval[2], 3), round(eval[3], 3)))
+            # fig, ax = plt.subplots(1, 3, figsize=(12, 4))
+            # fig.suptitle(
+            #     'Sen:{:.4f}  Pre:{:.4f}  F1:{:.4f}'.format(round(eval[1], 3), round(eval[2], 3),
+            #                                                round(eval[3], 3)),
+            #     fontsize=16, y=0.065)
+            # ax[0].set_axis_off()
+            # ax[0].imshow(raw_img, cmap="gray")
+            # ax[0].set_title("Raw image")
+            # ax[1].set_axis_off()
+            # ax[1].imshow(reshaped_label, cmap="gray")
+            # ax[1].set_title("Label image")
+            # ax[2].set_axis_off()
+            # ax[2].imshow(reshaped_res, cmap="gray")
+            # ax[2].set_title("Output image")
+            # plt.show()
+        print('recall:', str(round(np.mean(recall_list), 3)), '±', round(np.std(recall_list), 3))
+        print('precision:', round(np.mean(precision_list), 3), '±', round(np.std(precision_list), 3))
+        print('F1:', round(np.mean(F1_list), 3), '±', round(np.std(F1_list), 3))
+
     def test_multi(self):
         with np.load(self.args.load_npz_path, allow_pickle=True) as f:
             x_test, y_test, img_name = f['X_test_' + str(self.args.k_fold)], f['Y_test_' + str(self.args.k_fold)], f['X_test_' + str(self.args.k_fold) + '_name']
+        self.model_file_path = self.args.load_model + '/' + 'best_score(k=' + str(self.args.k_fold) + ').hdf5'
         self.model.load_weights(self.model_file_path)
         tool.make_path(self.args.load_model + '_fold_' + str(self.args.k_fold))
         for i in tqdm(range(1, 10), desc='threshold'):
@@ -126,10 +175,10 @@ class Test:
                                            F1_threshold(0.1 * i)])
                     inputs_np = x_test[j].reshape([1] + [x_test[j].shape[0], x_test[j].shape[1], x_test[j].shape[2]])
                     y_test_ = y_test[j].reshape([1] + [y_test[j].shape[0], y_test[j].shape[1], y_test[j].shape[2]])
-                    if self.args.label_div_255 == True:
-                        labels_np = y_test_ / 255.
-                    elif self.args.label_div_255 == False:
-                        labels_np = y_test_
+                    # if self.args.label_div_255 == True:
+                    #     labels_np = y_test_ / 255.
+                    # elif self.args.label_div_255 == False:
+                    labels_np = y_test_
 
                     eval = self.model.evaluate(inputs_np, labels_np)
                     res = self.model.predict(inputs_np)
@@ -164,7 +213,37 @@ class Test:
                         round(0.1 * i, 1)) + '/predict_3plot/' + data_name)
                     plt.imsave(self.args.load_model + '_fold_' + str(self.args.k_fold) + '/th_' + str(
                         round(0.1 * i, 1)) + '/predicted_image/' + data_name, reshaped_res, cmap="gray")
-        
+
+    def test_multi_performance(self):
+        with np.load(self.args.load_npz_path, allow_pickle=True) as f:
+            x_test, y_test, img_name = f['X_test_' + str(self.args.k_fold)], f['Y_test_' + str(self.args.k_fold)], f['X_test_' + str(self.args.k_fold) + '_name']
+        self.model_file_path = self.args.load_model + '/' + 'best_score(k=' + str(self.args.k_fold) + ').hdf5'
+        self.model.load_weights(self.model_file_path)
+        recall_list = []
+        precision_list = []
+        F1_list = []
+        for j, data_name in tqdm(enumerate(img_name)):
+            self.model.compile(self.optimizer, loss=self.loss,
+                               metrics=[recall_threshold(0.5), precision_threshold(0.5), F1_threshold(0.5)])
+            inputs_np = x_test[j].reshape([1] + [x_test[j].shape[0], x_test[j].shape[1], x_test[j].shape[2]])
+            y_test_ = y_test[j].reshape([1] + [y_test[j].shape[0], y_test[j].shape[1], y_test[j].shape[2]])
+            # if self.args.label_div_255 == True:
+            #     labels_np = y_test_ / 255.
+            # elif self.args.label_div_255 == False:
+            labels_np = y_test_
+
+            eval = self.model.evaluate(inputs_np, labels_np)
+            recall_list.append(round(eval[1], 3))
+            precision_list.append(round(eval[2], 3))
+            F1_list.append(round(eval[3], 3))
+            # print('Sen:{:.4f}  Pre:{:.4f}  F1:{:.4f}'.format(round(eval[1], 3), round(eval[2], 3), round(eval[3], 3)))
+            # print(data_name + ',' + str(round(eval[2], 3)) + ',' + str(
+            #     round(eval[1], 3)) + ',' + str(
+            #     round(eval[3], 3)))
+        print('recall:', str(round(np.mean(recall_list), 3)), '±', round(np.std(recall_list), 3))
+        print('precision:', round(np.mean(precision_list), 3), '±', round(np.std(precision_list), 3))
+        print('F1:', round(np.mean(F1_list), 3), '±', round(np.std(F1_list), 3))
+
     # def test_pixel_total(self, threshold_=5):
     #     with open(self.args.save_csv_name, 'a', newline='') as csv_file:
     #         csv_file.write('epoch_weight, 0~0.1, 0.1~0.2, 0.2~0.3, 0.3~0.4, 0.4~0.5, 0.5~0.6, 0.6~0.7, 0.7~0.8, 0.8~0.9, 0.9~1\n')

@@ -8,6 +8,7 @@ from scipy.ndimage.filters import gaussian_filter
 from scipy.ndimage.interpolation import map_coordinates
 from skimage import transform as sk_tf
 import matplotlib.pyplot as plt
+from skimage import measure, color
 
 ###################### AUGMENTATION #################################################
 def apply_mask(image, label, n_squares=1):
@@ -284,8 +285,8 @@ def save_npz(x_train_path, y_train_path, x_test_path, y_test_path, save_path, sa
             inputs_np = read_images_rgb(x_train_path[0], [512, 512, 3])[0]  # inputs_np shape: [N, 512, 512, 3]
             val_inputs_np = read_images_rgb(x_test_path[0], [512, 512, 3])[0]
         else:
-            inputs_np = read_images_(x_train_path[0], [512, 512, 1])[0]  # inputs_np shape: [N, 512, 512, 1]
-            val_inputs_np = read_images_(x_test_path[0], [512, 512, 1])[0]
+            inputs_np = read_images_(x_train_path[0], [512, 512, 1], 'image_gray')[0]  # inputs_np shape: [N, 512, 512, 1]
+            val_inputs_np = read_images_(x_test_path[0], [512, 512, 1], 'image_gray')[0]
 
         if label_div_255 == True:
             labels_np = read_images_(y_train_path[0], [512, 512, 1])[0] / 255.  # labels_np shape: [N, 512, 512, 1]

@@ -7,6 +7,20 @@ from Original_Unet import unet
 import numpy as np
 import tool
 
+# parameter for loss function
+smooth = 1.
+
+#  metric function and loss function
+def dice_coef(y_true, y_pred):
+	y_true_f = K.flatten(y_true)
+	y_pred_f = K.flatten(y_pred)
+	intersection = K.sum(y_true_f * y_pred_f)
+	return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+
+
+def dice_coef_loss(y_true, y_pred):
+	return -dice_coef(y_true, y_pred)
+
 class Train:
     def __init__(self, args):
         self.model_path = tool.make_path(args.save_model + '/')
@@ -28,6 +42,7 @@ class Train:
             self.model = unet(input_size=(None, None, 3))
         else:
             raise ValueError('Not correct backbone name `{}`, use {}'.format(args.backbone, [name for name,_ in segmentation_models.Backbones._default_feature_layers.items()]))
+
 
     def augmentation(self, x_train, y_train):
         if self.args.aug_flag == 'random':
@@ -95,8 +110,7 @@ class Train:
             x_train, y_train = self.augmentation(f['X_train'], f['Y_train'])
             x_test, y_test = f['X_test'], f['Y_test']
         model_file_path = self.model_path + 'best_score.hdf5'
-        checkpoint = ModelCheckpoint(model_file_path, monitor='val_F1', verbose=1, save_best_only=True,
-                                     mode='max')  # keras
+        checkpoint = ModelCheckpoint(model_file_path, monitor='val_F1', verbose=1, save_best_only=True, mode='max')  # keras
         callbacks = [checkpoint]
         if self.args.loss == "weighted_binary_crossentropy":
             self.loss = weighted_binary_crossentropy(weights=self.args.weight_pos)
@@ -109,6 +123,11 @@ class Train:
 
         self.model.compile(self.optimizer, loss=self.loss,
                            metrics=[precision_threshold(), recall_threshold(), F1_threshold()])
+
+        ## load pretrain model
+        if self.args.is_pretrain_model:
+            keras.models.load_model(self.args.load_pretrain_model,custom_objects={'dice_loss': self.loss, 'precision':precision_threshold(), 'recall':recall_threshold(), 'F1':F1_threshold()}, compile=False)
+        ######################
 
         history_callback = self.model.fit(x=x_train, y=y_train, batch_size=self.args.batch_size, epochs=self.args.epoch,
                                           validation_data=(x_test, y_test),
@@ -145,6 +164,11 @@ class Train:
             callbacks += CustomValidationLoss(self.args.first_alpha, self.args.last_beta, self.args.loss, self.model, self.optimizer)
         '''''''''
         self.model.compile(self.optimizer, loss=self.loss, metrics=[precision_threshold(), recall_threshold(), F1_threshold()])
+
+        ## load pretrain model
+        if self.args.is_pretrain_model:
+            keras.models.load_model(self.args.load_pretrain_model,custom_objects={'dice_loss': self.loss, 'precision':precision_threshold(), 'recall':recall_threshold(), 'F1':F1_threshold()}, compile=False)
+        ######################
 
         history_callback = self.model.fit(x=x_train, y=y_train, batch_size=self.args.batch_size, epochs=self.args.epoch,
                                      validation_data=(x_test, y_test),
