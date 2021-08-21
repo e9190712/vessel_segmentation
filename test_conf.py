@@ -12,6 +12,7 @@ if config['MODE']['mode'] == 'test_single_img':
         y_test_img = config['TEST_SINGLE_IMG']['y_test_img']
         load_model = config['TEST_SINGLE_IMG']['load_model']
         load_Imagenet = config.getboolean('TEST_SINGLE_IMG', 'load_Imagenet')
+        total_pixels = config.getboolean('TEST_SINGLE_IMG', 'total_pixels')
         loss = config['TEST_SINGLE_IMG']['loss']
         init_lr = float(config['TEST_SINGLE_IMG']['init_lr'])
         optimizer = config['TEST_SINGLE_IMG']['optimizer']
@@ -21,7 +22,11 @@ if config['MODE']['mode'] == 'test_single_img':
             weight_pos = int(config['DEFAULT']['weight_pos'])
     ############ START ############
     from test import Test
-    Test(args).test_single()
+    if args.total_pixels:
+        Test(args).test_single_pixels()
+    else:
+        Test(args).test_single()
+
 ############ TEST_ALL_PR ############
 elif config['MODE']['mode'] == 'test_All_PR':
     class args:

@@ -5,7 +5,7 @@ import os
 from tool import save_npz
 
 config = configparser.ConfigParser()
-config.read('parameter.conf', encoding='utf-8')
+config.read('train_parameter.conf', encoding='utf-8')
 os.environ['CUDA_VISIBLE_DEVICES'] = config['DEFAULT']['n_GPU']
 ############ make npz ############
 if config['MODE']['mode'] == 'make_npz_dataset':

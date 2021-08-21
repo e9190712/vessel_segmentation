@@ -18,7 +18,7 @@ class Test:
             self.optimizer = keras.optimizers.Adam(lr=args.init_lr)
         elif args.optimizer == 'AdamW':
             from tensorflow_addons.optimizers import AdamW
-            self.optimizer = AdamW(learning_rate=args.init_lr, weight_decay=args.weight_decay)
+            self.optimizer = AdamW(learning_rate=args.init_lr, weight_decay=1e-4)
 
         if self.args.loss == "weighted_binary_crossentropy":
             self.loss = weighted_binary_crossentropy(weights=self.args.weight_pos)
@@ -87,6 +87,7 @@ class Test:
                 pixels.append(reshaped_res[i, j])
         counts, bins, bars = plt.hist(pixels, density=False, color='skyblue', lw=0, cumulative=False, label='pixels',
                                       bins=10, range=[0, 1])
+        print(counts)
         plt.xlabel('Confidence')
         plt.ylabel('% of Samples')
         plt.title(self.args.backbone)
@@ -109,6 +110,40 @@ class Test:
         plt.title(self.args.backbone)
         plt.grid(True)
         plt.show()
+    def test_single_pixels(self, threshold_=5):
+        self.model_file_path = self.args.load_model + '/' + 'best_score.hdf5'
+        self.model.load_weights(self.model_file_path)
+        self.model.compile(self.optimizer, loss=self.loss,
+                           metrics=[recall_threshold(0.1 * threshold_), precision_threshold(0.1 * threshold_),
+                                    F1_threshold(0.1 * threshold_)])
+        inputs_np = self.read_image_rgb_single(self.args.x_test_img)
+        images_label_np = self.read_image_binary_single(self.args.y_test_img)
+        res = self.model.predict(inputs_np)
+        eval = self.model.evaluate(inputs_np, images_label_np)
+        # SEN = eval[1]
+        # PRE = eval[2]
+        F1 = eval[3]
+        reshaped_res = np.reshape(res, list(self.gray_img.shape))
+        c, r = reshaped_res.shape
+        pixels = []
+        pixel_valu = [[] for y in range(10)]
+        for i in range(c):
+            for j in range(r):
+                for b in np.linspace(0, 1, 11):
+                    if b == 1:
+                        break
+                    elif reshaped_res[i, j] >= round(b, 1) and reshaped_res[i, j] < round(b + 0.1, 1):
+                        pixel_valu[round(round(b, 1) * 10)].append(reshaped_res[i, j])
+                pixels.append(reshaped_res[i, j])
+        counts, bins, bars = plt.hist(pixels, density=False, color='skyblue', lw=0, cumulative=False, label='pixels',
+                                      bins=10, range=[0, 1])
+        print(counts)
+        plt.xlabel('pixel value')
+        plt.ylabel('% of Samples')
+        plt.title(self.args.backbone)
+        plt.grid(True)
+        plt.show()
+
     def test(self):
         with np.load(self.args.load_npz_path, allow_pickle=True) as f:
             x_test, y_test = f['X_test'], f['Y_test']

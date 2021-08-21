@@ -1,4 +1,5 @@
 from loss_function import *
+from shutil import copy
 from tqdm import tqdm
 import keras
 from keras.callbacks import ModelCheckpoint
@@ -29,7 +30,7 @@ class Train:
             self.optimizer = keras.optimizers.Adam(lr=args.init_lr)
         elif args.optimizer == 'AdamW':
             from tensorflow_addons.optimizers import AdamW
-            self.optimizer = AdamW(learning_rate=args.init_lr, weight_decay=args.weight_decay)
+            self.optimizer = AdamW(learning_rate=args.init_lr, weight_decay=1e-4)
 
         if args.backbone in [name for name,_ in segmentation_models.Backbones._default_feature_layers.items()] and [name for name,_ in segmentation_models.Backbones._models_update.items()]:
             print('Segmentation Backbone: using {}'.format(args.backbone))
@@ -53,7 +54,7 @@ class Train:
                 X_train[b * 2] = x_train[b]
                 Y_train[b * 2] = y_train[b]
                 X_train[b * 2 + 1], Y_train[b * 2 + 1] = tool.data_augmentation(self.args, x_train[b], y_train[b])
-        if self.args.aug_flag == 'auto':
+        elif self.args.aug_flag == 'auto':
             X_train = np.zeros((x_train.shape[0] * 11, self.args.size, self.args.size, x_train.shape[3]))
             Y_train = np.zeros((y_train.shape[0] * 11, self.args.size, self.args.size, y_train.shape[3]))
 
@@ -65,7 +66,7 @@ class Train:
                 X_train[b * 11 + 6], Y_train[b * 11 + 6], X_train[b * 11 + 7], Y_train[b * 11 + 7], X_train[b * 11 + 8], \
                 Y_train[b * 11 + 8], X_train[b * 11 + 9], Y_train[b * 11 + 9], X_train[b * 11 + 10], Y_train[
                     b * 11 + 10] = tool.data_augmentation_change(x_train[b], y_train[b])
-        if self.args.aug_flag == 'old':
+        elif self.args.aug_flag == 'old':
             X_train = np.zeros((x_train.shape[0] * 5,  self.args.size,  self.args.size, x_train.shape[3]))
             Y_train = np.zeros((y_train.shape[0] * 5,  self.args.size,  self.args.size, y_train.shape[3]))
 
@@ -73,7 +74,7 @@ class Train:
                 X_train[b * 5] = x_train[b]
                 Y_train[b * 5] = y_train[b]
                 X_train[b * 5 + 1], Y_train[b * 5 + 1], X_train[b * 5 + 2], Y_train[b * 5 + 2], X_train[b * 5 + 3], Y_train[b * 5 + 3], X_train[b * 5 + 4], Y_train[b * 5 + 4] = tool.data_augmentation_old(x_train[b], y_train[b])
-        if self.args.aug_flag == 'off':
+        elif self.args.aug_flag == 'off':
             X_train = x_train
             Y_train = y_train
         return X_train, Y_train
@@ -106,6 +107,7 @@ class Train:
         with open(save_txt, "w") as f:
             f.write(str(max(F1_Max)))
     def train(self):
+        copy('train_parameter.conf', self.model_path + 'train_parameter.conf')
         with np.load(self.args.load_npz_path, allow_pickle=True) as f:
             x_train, y_train = self.augmentation(f['X_train'], f['Y_train'])
             x_test, y_test = f['X_test'], f['Y_test']
@@ -114,11 +116,11 @@ class Train:
         callbacks = [checkpoint]
         if self.args.loss == "weighted_binary_crossentropy":
             self.loss = weighted_binary_crossentropy(weights=self.args.weight_pos)
-        if self.args.loss == "dice_loss_beta":
+        elif self.args.loss == "dice_loss_beta":
             self.loss = segmentation_models.losses.DiceLoss(beta=self.args.fbeta)
-        if self.args.loss == "bce_dice_loss":
+        elif self.args.loss == "bce_dice_loss":
             self.loss = segmentation_models.losses.bce_dice_loss
-        if self.args.loss == "generalized_dice_loss":
+        elif self.args.loss == "generalized_dice_loss":
             self.loss = generalized_dice_loss()
 
         self.model.compile(self.optimizer, loss=self.loss,
@@ -137,21 +139,21 @@ class Train:
 
 
     def k_fold_train(self):
+        copy('train_parameter.conf', self.model_path + 'train_parameter.conf')
         with np.load(self.args.load_npz_path, allow_pickle=True) as f:
             x_train, y_train = self.augmentation(f['X_train_' + str(self.args.k_fold)], f['Y_train_' + str(self.args.k_fold)])
             x_test, y_test = f['X_test_' + str(self.args.k_fold)], f['Y_test_' + str(self.args.k_fold)]
-
         model_file_path = self.model_path + 'best_score(k=' + str(self.args.k_fold) + ').hdf5'
         checkpoint = ModelCheckpoint(model_file_path, monitor='val_F1', verbose=1, save_best_only=True,
                                      mode='max')  # keras
         callbacks = [checkpoint]
         if self.args.loss == "weighted_binary_crossentropy":
             self.loss = weighted_binary_crossentropy(weights=self.args.weight_pos)
-        if self.args.loss == "dice_loss_beta":
+        elif self.args.loss == "dice_loss_beta":
             self.loss = segmentation_models.losses.DiceLoss(beta=self.args.fbeta)
-        if self.args.loss == "bce_dice_loss":
+        elif self.args.loss == "bce_dice_loss":
             self.loss = segmentation_models.losses.bce_dice_loss
-        if self.args.loss == "generalized_dice_loss":
+        elif self.args.loss == "generalized_dice_loss":
             self.loss = generalized_dice_loss()
         ''''''''' not used anymore
         if self.args.loss == "stochastic_F1":
