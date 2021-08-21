@@ -30,7 +30,7 @@ or use my Sharing Environments
 conda env create -f tf_1_14_0_keras.yaml
 ```
 ### Usage
-train_parameter.conf --> main_conf.py (訓練用，使用說明在.conf中)<br>
+train_parameter.conf --> train_conf.py (訓練用，使用說明在.conf中)<br>
 test_parameter.conf --> test_conf.py (測試用，使用說明在.conf中)<br>
 About ```--backbone``` you can ref to (https://github.com/qubvel/segmentation_models) <br>
 About ```--backbone --> original``` you can ref to (https://arxiv.org/pdf/1505.04597.pdf)
